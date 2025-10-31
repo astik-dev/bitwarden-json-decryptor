@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Bitwarden JSON Decryptor</title>
+</head>
+<body>
+	
+	<input type="file" accept=".json">
+	<input type="password">
+	<button>Decrypt</button>
+
+	<p style="white-space: pre;"></p>
+
+	<script src="js/bitwarden-crypto.js"></script>
+	<script src="js/decrypt.js"></script>
+	
+	<script>
+		const decryptButton = document.querySelector("button");
+		const fileInput = document.querySelector("input[type='file']");
+		const passwordInput = document.querySelector("input[type='password']");
+
+		decryptButton.addEventListener("click", () => {
+
+			const jsonFile = fileInput.files[0];
+			const masterPassword = passwordInput.value;
+
+			const fileReader = new FileReader();
+
+			fileReader.onload = async () => {
+				const json = fileReader.result;
+				const decryptedJson =
+					await decryptBitwardenJson(json, masterPassword);
+				document.querySelector("p").textContent = decryptedJson;
+			};
+
+			fileReader.readAsText(jsonFile);
+		});
+	</script>
+
+</body>
+</html>
