@@ -99,10 +99,6 @@ function toB64(buf) {
 	return window.btoa(binary)
 }
 
-// function hasValue(str) {
-// 	return str && str !== ''
-// }
-
 // Crypto
 
 async function pbkdf2(password, salt, iterations, length) {
