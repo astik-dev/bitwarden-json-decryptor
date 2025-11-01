@@ -1,0 +1,66 @@
+.header {
+	text-align: center;
+}
+
+.header h1 {
+	font-size: 1.5em;
+}
+
+
+
+.form,
+.success {
+	display: flex;
+	flex-direction: column;
+	gap: 25px;
+
+	max-width: 400px;
+
+	padding: 15px;
+	margin: 10px auto;
+
+	border: 1px solid black;
+	border-radius: 3px;
+}
+
+.form p,
+.success p {
+	margin: 0;
+}
+
+
+
+.form__input {
+	display: flex;
+	flex-direction: column;
+}
+
+.form__input > label {
+	font-weight: bold;
+}
+
+.form__input > input {
+	margin-top: 6px;
+
+}
+
+.form__checkbox {
+	display: flex;
+	align-items: center;
+
+	margin-top: 2px;
+}
+
+.form__button {
+	height: 30px;
+}
+
+.form p {
+	text-align: center;
+}
+
+
+
+.success {
+	text-align: center;
+}

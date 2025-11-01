@@ -4,21 +4,51 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Bitwarden JSON Decryptor</title>
+	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 	
-	<input type="file" accept=".json">
-	<input type="password">
-	<input type="checkbox" id="show-password">
-	<label for="show-password">Show password</label>
-	<button id="decrypt-btn">Decrypt</button>
+	<div class="header">
+		<h1>Bitwarden JSON Decryptor</h1>
+		<p>Decrypt your password-protected Bitwarden JSON exports locally in your browser</p>
+	</div>
 
-	<br>
-	<br>
+	<div class="form">
 
-	<div style="display: none;">
-		<button id="download-json-btn">Download JSON</button>
-		<p style="white-space: pre;"></p>
+		<div class="form__input">
+			<label for="file-input">Encrypted JSON File</label>
+			<input type="file" accept=".json" id="file-input">
+		</div>
+
+		<div class="form__input">
+			<label for="password-input">Master Password</label>
+			<input
+				type="password"
+				id="password-input"
+				placeholder="Enter your master password"
+			>
+			<div class="form__checkbox">
+				<input type="checkbox" id="show-password">
+				<label for="show-password">Show password</label>
+			</div>
+		</div>
+
+		<button class="form__button" id="decrypt-btn">Decrypt</button>
+
+		<p>All decryption happens locally in your browser. Your password and data never leave your device.</p>
+		<p>
+			<a
+				href="https://github.com/astik-dev/bitwarden-json-decryptor"
+				target="_blank"
+			>GitHub</a>
+		</p>
+
+	</div>
+
+	<div class="success" style="display: none;">
+		<p>✅ Decryption successful!</p>
+		<a id="download-json-link" download="vault.json">Download Decrypted JSON</a>
+		<a id="view-json-link" target="_blank">View Decrypted JSON</a>
 	</div>
 
 	<script src="js/bitwarden-crypto.js"></script>
@@ -26,11 +56,9 @@
 	
 	<script>
 		const decryptButton = document.getElementById("decrypt-btn");
-		const fileInput = document.querySelector("input[type='file']");
-		const passwordInput = document.querySelector("input[type='password']");
+		const fileInput = document.getElementById("file-input");
+		const passwordInput = document.getElementById("password-input");
 		const showPasswordCheckbox = document.getElementById("show-password");
-		const downloadJsonButton = document.getElementById("download-json-btn");
-		const decryptedJsonP = document.querySelector("p");
 
 		decryptButton.addEventListener("click", () => {
 
@@ -43,30 +71,20 @@
 				const json = fileReader.result;
 				const decryptedJson =
 					await decryptBitwardenJson(json, masterPassword);
-				decryptedJsonP.textContent = decryptedJson;
-				document.querySelector("div").style.display =
-					decryptedJson ? "block" : "none";
 				if (decryptedJson) {
+					const blob = new Blob([decryptedJson], {
+						type: "application/json",
+					});
+					const url = URL.createObjectURL(blob);
+					document.getElementById("download-json-link").href = url;
+					document.getElementById("view-json-link").href = url;
 					passwordInput.value = "";
 				}
+				document.querySelector(".success").style.display =
+					decryptedJson ? "" : "none";
 			};
 
 			fileReader.readAsText(jsonFile);
-		});
-
-		downloadJsonButton.addEventListener("click", () => {
-
-			const decryptedJson = decryptedJsonP.textContent;
-
-			const blob = new Blob([decryptedJson], { type: "application/json" });
-
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement("a");
-			link.href = url;
-			link.download = "vault.json";
-			link.click();
-
-			URL.revokeObjectURL(url);
 		});
 
 		showPasswordCheckbox.addEventListener("change", () => {
