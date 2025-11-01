@@ -9,6 +9,8 @@
 	
 	<input type="file" accept=".json">
 	<input type="password">
+	<input type="checkbox" id="show-password">
+	<label for="show-password">Show password</label>
 	<button id="decrypt-btn">Decrypt</button>
 
 	<br>
@@ -26,6 +28,7 @@
 		const decryptButton = document.getElementById("decrypt-btn");
 		const fileInput = document.querySelector("input[type='file']");
 		const passwordInput = document.querySelector("input[type='password']");
+		const showPasswordCheckbox = document.getElementById("show-password");
 		const downloadJsonButton = document.getElementById("download-json-btn");
 		const decryptedJsonP = document.querySelector("p");
 
@@ -61,6 +64,10 @@
 			link.click();
 
 			URL.revokeObjectURL(url);
+		});
+
+		showPasswordCheckbox.addEventListener("change", () => {
+			passwordInput.type = showPasswordCheckbox.checked ? "text" : "password";
 		});
 	</script>
 
