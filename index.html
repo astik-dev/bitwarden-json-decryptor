@@ -9,17 +9,25 @@
 	
 	<input type="file" accept=".json">
 	<input type="password">
-	<button>Decrypt</button>
+	<button id="decrypt-btn">Decrypt</button>
 
-	<p style="white-space: pre;"></p>
+	<br>
+	<br>
+
+	<div style="display: none;">
+		<button id="download-json-btn">Download JSON</button>
+		<p style="white-space: pre;"></p>
+	</div>
 
 	<script src="js/bitwarden-crypto.js"></script>
 	<script src="js/decrypt.js"></script>
 	
 	<script>
-		const decryptButton = document.querySelector("button");
+		const decryptButton = document.getElementById("decrypt-btn");
 		const fileInput = document.querySelector("input[type='file']");
 		const passwordInput = document.querySelector("input[type='password']");
+		const downloadJsonButton = document.getElementById("download-json-btn");
+		const decryptedJsonP = document.querySelector("p");
 
 		decryptButton.addEventListener("click", () => {
 
@@ -32,10 +40,27 @@
 				const json = fileReader.result;
 				const decryptedJson =
 					await decryptBitwardenJson(json, masterPassword);
-				document.querySelector("p").textContent = decryptedJson;
+				decryptedJsonP.textContent = decryptedJson;
+				document.querySelector("div").style.display =
+					decryptedJson ? "block" : "none";
 			};
 
 			fileReader.readAsText(jsonFile);
+		});
+
+		downloadJsonButton.addEventListener("click", () => {
+
+			const decryptedJson = decryptedJsonP.textContent;
+
+			const blob = new Blob([decryptedJson], { type: "application/json" });
+
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.download = "vault.json";
+			link.click();
+
+			URL.revokeObjectURL(url);
 		});
 	</script>
 
