@@ -46,6 +46,9 @@
 				decryptedJsonP.textContent = decryptedJson;
 				document.querySelector("div").style.display =
 					decryptedJson ? "block" : "none";
+				if (decryptedJson) {
+					passwordInput.value = "";
+				}
 			};
 
 			fileReader.readAsText(jsonFile);
