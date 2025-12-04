@@ -13,11 +13,11 @@
 		<p>Decrypt your password-protected Bitwarden JSON exports locally in your browser</p>
 	</div>
 
-	<div class="form">
+	<form class="form">
 
 		<div class="form__input">
 			<label for="file-input">Encrypted JSON File</label>
-			<input type="file" accept=".json" id="file-input">
+			<input type="file" accept=".json" id="file-input" required>
 		</div>
 
 		<div class="form__input">
@@ -26,6 +26,7 @@
 				type="password"
 				id="password-input"
 				placeholder="Enter your master password"
+				required
 			>
 			<div class="form__checkbox">
 				<input type="checkbox" id="show-password">
@@ -33,7 +34,7 @@
 			</div>
 		</div>
 
-		<button class="form__button" id="decrypt-btn">Decrypt</button>
+		<button class="form__button">Decrypt</button>
 
 		<p>All decryption happens locally in your browser. Your password and data never leave your device.</p>
 		<p>
@@ -43,7 +44,7 @@
 			>GitHub</a>
 		</p>
 
-	</div>
+	</form>
 
 	<div class="success" style="display: none;">
 		<p>✅ Decryption successful!</p>
@@ -55,12 +56,13 @@
 	<script src="js/decrypt.js"></script>
 	
 	<script>
-		const decryptButton = document.getElementById("decrypt-btn");
 		const fileInput = document.getElementById("file-input");
 		const passwordInput = document.getElementById("password-input");
 		const showPasswordCheckbox = document.getElementById("show-password");
 
-		decryptButton.addEventListener("click", () => {
+		document.querySelector("form").addEventListener("submit", event => {
+			
+			event.preventDefault();
 
 			const jsonFile = fileInput.files[0];
 			const masterPassword = passwordInput.value;
