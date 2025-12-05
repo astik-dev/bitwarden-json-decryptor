@@ -1,4 +1,22 @@
 /**
+ * @param {object} json 
+ * @returns {boolean}
+ */
+function validateBitwardenJson(json) {
+	return (
+		json.encrypted === true &&
+		json.passwordProtected === true &&
+		typeof json.salt === "string" &&
+		json.kdfType === 0 &&
+		typeof json.kdfIterations === "number" &&
+		typeof json.encKeyValidation_DO_NOT_EDIT === "string" &&
+		json.encKeyValidation_DO_NOT_EDIT.startsWith("2") &&
+		typeof json.data === "string" &&
+		json.data.startsWith("2")
+	);
+}
+
+/**
  * @param {string} b64 
  * @returns {ArrayBuffer}
  */
@@ -37,6 +55,11 @@ function parseCipherString(cipherString) {
 async function decryptBitwardenJson(json, masterPassword) {
 
 	const jsonObj = JSON.parse(json);
+
+	const isValidJsonObj = validateBitwardenJson(jsonObj);
+	if (isValidJsonObj === false) {
+		throw new Error("Invalid JSON");
+	}
 
 	const saltBuf = fromUtf8(jsonObj.salt);
 	const passwordBuf = fromUtf8(masterPassword);
