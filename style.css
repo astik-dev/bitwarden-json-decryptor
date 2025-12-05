@@ -9,7 +9,8 @@
 
 
 .form,
-.success {
+.success,
+.failure {
 	display: flex;
 	flex-direction: column;
 	gap: 25px;
@@ -24,7 +25,8 @@
 }
 
 .form p,
-.success p {
+.success p,
+.failure p {
 	margin: 0;
 }
 
@@ -61,6 +63,7 @@
 
 
 
-.success {
+.success,
+.failure {
 	text-align: center;
 }

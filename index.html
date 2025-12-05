@@ -52,6 +52,11 @@
 		<a id="view-json-link" target="_blank">View Decrypted JSON</a>
 	</div>
 
+	<div class="failure" style="display: none;">
+		<p>❌ Decryption failed!</p>
+		<p id="error-message"></p>
+	</div>
+
 	<script src="js/bitwarden-crypto.js"></script>
 	<script src="js/decrypt.js"></script>
 	
@@ -70,10 +75,12 @@
 			const fileReader = new FileReader();
 
 			fileReader.onload = async () => {
-				const json = fileReader.result;
-				const decryptedJson =
-					await decryptBitwardenJson(json, masterPassword);
-				if (decryptedJson) {
+				let isDecryptionSuccessful = false;
+				try {
+					const json = fileReader.result;
+					const decryptedJson = 
+						await decryptBitwardenJson(json, masterPassword);
+					isDecryptionSuccessful = true;
 					const blob = new Blob([decryptedJson], {
 						type: "application/json",
 					});
@@ -81,9 +88,14 @@
 					document.getElementById("download-json-link").href = url;
 					document.getElementById("view-json-link").href = url;
 					passwordInput.value = "";
+				} catch (error) {
+					document.getElementById("error-message").textContent = error;
+				} finally {
+					document.querySelector(".success").style.display =
+						isDecryptionSuccessful ? "" : "none";
+					document.querySelector(".failure").style.display =
+						isDecryptionSuccessful ? "none" : "";
 				}
-				document.querySelector(".success").style.display =
-					decryptedJson ? "" : "none";
 			};
 
 			fileReader.readAsText(jsonFile);

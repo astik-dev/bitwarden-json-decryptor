@@ -1,5 +1,6 @@
 // Source:
 // https://web.archive.org/web/20250331235951/https://bitwarden.com/crypto.html
+// Modified: removed try/catch blocks to allow errors to propagate for external handling
 
 
 
@@ -118,16 +119,12 @@ async function pbkdf2(password, salt, iterations, length) {
 		length: length,
 	}
 
-	try {
-		const importedKey = await window.crypto.subtle.importKey('raw', password, importAlg, false, ['deriveKey'])
-		const derivedKey = await window.crypto.subtle.deriveKey(deriveAlg, importedKey, aesOptions, true, [
-			'encrypt',
-		])
-		const exportedKey = await window.crypto.subtle.exportKey('raw', derivedKey)
-		return new ByteData(exportedKey)
-	} catch (err) {
-		console.log(err)
-	}
+	const importedKey = await window.crypto.subtle.importKey('raw', password, importAlg, false, ['deriveKey'])
+	const derivedKey = await window.crypto.subtle.deriveKey(deriveAlg, importedKey, aesOptions, true, [
+		'encrypt',
+	])
+	const exportedKey = await window.crypto.subtle.exportKey('raw', derivedKey)
+	return new ByteData(exportedKey)
 }
 
 async function aesDecrypt(cipher, encKey, macKey) {
@@ -140,25 +137,21 @@ async function aesDecrypt(cipher, encKey, macKey) {
 		iv: cipher.iv.arr.buffer,
 	}
 
-	try {
-		const checkMac = cipher.encType != encTypes.AesCbc256_B64
-		if (checkMac) {
-			if (!macKey) {
-				throw 'MAC key not provided.'
-			}
-			const dataForMac = buildDataForMac(cipher.iv.arr, cipher.ct.arr)
-			const macBuffer = await computeMac(dataForMac.buffer, macKey.arr.buffer)
-			const macsMatch = await macsEqual(cipher.mac.arr.buffer, macBuffer, macKey.arr.buffer)
-			if (!macsMatch) {
-				throw 'MAC check failed.'
-			}
-			const importedKey = await window.crypto.subtle.importKey('raw', encKey.arr.buffer, keyOptions, false, [
-				'decrypt',
-			])
-			return window.crypto.subtle.decrypt(decOptions, importedKey, cipher.ct.arr.buffer)
+	const checkMac = cipher.encType != encTypes.AesCbc256_B64
+	if (checkMac) {
+		if (!macKey) {
+			throw 'MAC key not provided.'
 		}
-	} catch (err) {
-		console.error(err)
+		const dataForMac = buildDataForMac(cipher.iv.arr, cipher.ct.arr)
+		const macBuffer = await computeMac(dataForMac.buffer, macKey.arr.buffer)
+		const macsMatch = await macsEqual(cipher.mac.arr.buffer, macBuffer, macKey.arr.buffer)
+		if (!macsMatch) {
+			throw 'MAC check failed.'
+		}
+		const importedKey = await window.crypto.subtle.importKey('raw', encKey.arr.buffer, keyOptions, false, [
+			'decrypt',
+		])
+		return window.crypto.subtle.decrypt(decOptions, importedKey, cipher.ct.arr.buffer)
 	}
 }
 
